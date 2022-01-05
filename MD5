@@ -1,0 +1,17 @@
+aa698e6ea7697e4e85b903979fd70070 *DESCRIPTION
+96c85010af70790661c413ad6e66d1f8 *NAMESPACE
+7abdb3df13896463d85c79244d3abe7a *R/runGeoWeightedModel.R
+b7beb54b78f38c73010f2861a8f22b28 *inst/GeoWeightedModelApp/global.R
+d1ccb061857b571c926bdcfbb8edfb64 *inst/GeoWeightedModelApp/server.R
+eb874ca6362674a24b13484cfe630413 *inst/GeoWeightedModelApp/ui.R
+5f321a57aa85ee8a2d1f5ea3c2f5bb8c *inst/GeoWeightedModelApp/www/Distance_Matrix.html
+0ff0dee507030debe65a39d90754dbee *inst/GeoWeightedModelApp/www/Help_bw.html
+975634935631b768f0a82b224f1d8cc4 *inst/GeoWeightedModelApp/www/Help_gwda.html
+4d690baed29155a1e499dbcfb5aeb700 *inst/GeoWeightedModelApp/www/Help_gwpca.html
+49b47b9ddd3df3d7e7a991b7f63af390 *inst/GeoWeightedModelApp/www/Help_gwss.html
+b8fc429a4304435c3a7101b04825b877 *inst/GeoWeightedModelApp/www/Upload-data.html
+811d97acf1775577d38a602cf486cc1f *inst/GeoWeightedModelApp/www/distance.png
+d7483a1c0aca4ecf07ce3069b9611d6d *inst/GeoWeightedModelApp/www/help_gwr.html
+d8cda9ba8177a6694a84d4e050f8c74e *inst/GeoWeightedModelApp/www/icono.png
+8fd3c830cd61a0cbab31cb39dc7720fa *inst/GeoWeightedModelApp/www/normal1.png
+f352a22489bddb26455a7924247b4f5f *man/runGeoWeightedModel.Rd
