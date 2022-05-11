@@ -71,3 +71,4 @@ gw.distGW<- function(dp.locat, rp.locat,
 }
 
 
+

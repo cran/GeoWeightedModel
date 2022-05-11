@@ -37,6 +37,7 @@ sidebar <- shinydashboard::dashboardSidebar(
              tabName = "tab1",
              icon = icon("file-import")
              ),
+
     shinydashboard::menuItem(div(tags$img(src = "distance.png",
                           width="20px",
                           height="20px"),
@@ -46,6 +47,10 @@ sidebar <- shinydashboard::dashboardSidebar(
     shinydashboard::menuItem("Bandwidth selection",
              tabName = "tab3",
              icon = icon("wifi")
+    ),
+    shinydashboard::menuItem("Spatial autocorrelation",
+                             tabName = "tab6",
+                             icon = icon("chart-bar")
     ),
     shinydashboard:: menuItem("Geographically Weighted Summary Statistics",
              tabName = "tab4",
@@ -112,7 +117,7 @@ background-color: #69c3ff;}
       tabName = "tab0",
       fluidRow(
         shinydashboard::tabBox(id = "tabset1",
-               height = 4000,
+               height = 400,
                width = 12,
                tabPanel(
                  " ",
@@ -151,7 +156,7 @@ background-color: #69c3ff;}
       )
       ),
     shinydashboard::tabItem(tabName = "tab1",
-                            shinydashboard::box(width = 12,
+                            fluidRow(column(width = 12,shinydashboard::box(width = 12,
                                title = "Load data ",
                                 status = "primary",
                                 solidHeader = TRUE,
@@ -199,8 +204,8 @@ background-color: #69c3ff;}
                                 ),mainPanel(DT::DTOutput("table1"),
                                             DT::DTOutput("example")
 
-                                )),
-                            shinydashboard::box(width = 12,
+                                ))),
+                               column(width = 12,  shinydashboard::box(width = 12,
                                 title = "Load shapefiles ",
                                 status = "primary",
                                 solidHeader = TRUE,
@@ -217,7 +222,7 @@ background-color: #69c3ff;}
                                                label="Get shapefiles")
                                              ),
                                 mainPanel(verbatimTextOutput("shpi")
-                                ))
+                                ))))
 
                             ),
 
@@ -287,7 +292,7 @@ background-color: #69c3ff;}
           DT::DTOutput("distmatrix")))
       ),
     shinydashboard::tabItem(
-      tabName = "tab3",
+      tabName = "tab3",fluidRow(column(width = 12,
       shinydashboard:: box(width = 12,
           title = "Bandwidth selection",
           status = "primary",
@@ -596,10 +601,10 @@ background-color: #69c3ff;}
               color = "danger"),
             ),
           mainPanel(verbatimTextOutput("selbw"))
-      )
+      )))
     ),
     shinydashboard::tabItem(
-      tabName = "tab4",
+      tabName = "tab4",fluidRow(column(width = 12,
       shinydashboard::box(width = 16,
           title = "Geographically Weighted Summary Statistics",
           status = "primary",
@@ -724,10 +729,10 @@ background-color: #69c3ff;}
                            choices = Pallete_color),
                          helpText(h4("North arrow position")),
                          numericInput("latgwss", "Latitude",
-                                      min = -90, max = 90, value = 28
+                                      min = -90, max = 90, value = 32
                          ),
                          numericInput("longwss", "Longitude",
-                                      min = -180, max = 180, value = -70
+                                      min = -180, max = 180, value = -74
                          ),
                          numericInput("scalegwss", "scale Arrow",
                                       min = 1, max = 10, value = 3
@@ -750,15 +755,15 @@ background-color: #69c3ff;}
                        ),
                        plotOutput("mapgwss",width = "100%"))
               )
-          ))),
+          ))))),
     shinydashboard::tabItem(
-      tabName = "tab52",
+      tabName = "tab52",fluidRow(column(width = 12,
       shinydashboard::box(width = 12,
                           title = "Geographically Weighted Regression",
                           status = "primary",
                           solidHeader = TRUE,
                           collapsible = TRUE,
-                          height = 3000,
+                          height = 4000,
                           sidebarPanel(
                             shinyWidgets::actionBttn(
                               "helpgwr",
@@ -784,6 +789,7 @@ background-color: #69c3ff;}
                               label = "Choose:",
                               choices = c(
                                 "Select",
+                                "Local collinearity diagnostics",
                                 "Basic GWR model",
                                 "Robust GWR model",
                                 "Generalised GWR models",
@@ -792,6 +798,86 @@ background-color: #69c3ff;}
                                 "Scalable GWR"),
                               options = list(
                                 style = "btn-primary")),
+                            conditionalPanel(
+                              condition = "input.Selectgwr == 'Local collinearity diagnostics'",
+                              div(style="display: inline-block;vertical-align:top;
+                                                     width: 100px;",
+                                  selectizeInput('dependientbgwrd',
+                                                 'Dependient',
+                                                 choices = NULL,
+                                                 multiple = TRUE,
+                                                 options = list(maxItems = 1))),
+                              div(style="display: inline-block;vertical-align:top;
+                              width: 150px;",
+                              selectizeInput(
+                                'independientbgwrd',
+                                'Independient(s)',
+                                choices = NULL,
+                                multiple = TRUE)),
+                              div(style="display: inline-block;vertical-align:top;
+                              width: 100px;",
+                              shinyWidgets::switchInput(
+                                "longlat",
+                                inputId = "longlatbgwrd",
+                                onLabel = "TRUE",
+                                offLabel = "FALSE",
+                                size = "mini")),
+                              div(style="display: inline-block;vertical-align:top;
+                              width: 100px;",
+                              shinyWidgets::switchInput("adaptive",
+                                                        inputId = "adaptativebgwrd",
+                                                        onLabel = "TRUE",
+                                                        offLabel = "FALSE",
+                                                        size = "mini")),
+                              div(
+                                style="display: inline-block;vertical-align:top;
+                          width: 150px;",
+                          shinyWidgets::prettyRadioButtons(
+                            inputId = "selbgwrd",
+                            label = "Distance bandwidth:",
+                            choices = c("Automatic","Manual")
+                          )),
+                          conditionalPanel(condition = "input.selbgwrd == 'Manual'",
+                                           div(style="display: inline-block;
+                                           vertical-align:top; width: 200px;",
+                                           numericInput('bwbgwrd',
+                                                        'bw',
+                                                        10,
+                                                        min = 1,
+                                                        max =Inf))),
+                          div(style="display: inline-block;
+                          vertical-align:top; width: 100px;",
+                          shinyWidgets::pickerInput(
+                            inputId = "kernelbgwrd",
+                            label = "Kernel",
+                            choices = kernel
+                          )),
+                          div(style="display: inline-block;
+                                       vertical-align:top; width: 200px;",
+                              numericInput('powerbgwrd',
+                                           'Power (Minkowski distance)',
+                                           2,
+                                           min = 1,
+                                           max = Inf)),
+                          div(style="display: inline-block;
+                                       vertical-align:top; width: 200px;",
+                              sliderInput("thetabgwrd",
+                                          "Theta (Angle in radians)",
+                                          min = 0,
+                                          max = 2,
+                                          value = 0,
+                                          step = 0.05
+                              )),
+
+                          shinyalert::useShinyalert(),
+                          shinyjs::useShinyjs(),
+                          shinyWidgets::actionBttn(
+                            inputId = "Runbgwrd",
+                            label = "Run",
+                            style = "float",
+                            block = TRUE,
+                            color = "danger"
+                          )),
                         conditionalPanel(
                           condition = "input.Selectgwr == 'Basic GWR model'",
                           div(style="display: inline-block;vertical-align:top;
@@ -1353,25 +1439,97 @@ background-color: #69c3ff;}
                       mainPanel(
                         tabsetPanel(
                           tabPanel("Summary",
-                                   helpText(h3("Summary :")),
-                                   verbatimTextOutput("gwrbasic"),
-                                   verbatimTextOutput("GGWRbasic"),
-                                   verbatimTextOutput("GGWRobust"),
-                                   verbatimTextOutput("GWRhetero"),
-                                   verbatimTextOutput("GWRmixed"),
-                                   verbatimTextOutput("GWRscalable"),
+                                   conditionalPanel(condition = "input.Selectgwr == 'Local collinearity diagnostics'",
+                                                    helpText(h3("SDF:")),
+                                                     DT::DTOutput("gwrbasicdVIF"),
+                                   ),
+                                   conditionalPanel(condition = "input.Selectgwr == 'Basic GWR model'",
+                                   verbatimTextOutput("gwrbasic")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Generalised GWR models'",
+                                   verbatimTextOutput("GGWRbasic")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Robust GWR model'",
+                                   verbatimTextOutput("GGWRobust")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Heteroskedastic GWR'",
+                                   verbatimTextOutput("GWRhetero")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Mixed GWR'",
+                                   verbatimTextOutput("GWRmixed")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Scalable GWR'",
+                                   verbatimTextOutput("GWRscalable")),
                                    br(),
-                                   helpText(h3("SDF:")),
-                                   div(),
-                                   DT::DTOutput("SDFgwrbasic"),
-                                   DT::DTOutput("SDFGGWRbasic"),
-                                   DT::DTOutput("SDFGWRRobust"),
-                                   DT::DTOutput("SDFGWRhetero"),
-                                   DT::DTOutput("SDFGWRmixed"),
-                                   DT::DTOutput("SDFGWRscalable")
+
+                                   conditionalPanel(condition = "input.Selectgwr == 'Basic GWR model'",
+                                                    helpText(h3("SDF:")),
+                                                    DT::DTOutput("SDFgwrbasic")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Generalised GWR models'",
+                                                    helpText(h3("SDF:")),
+                                                    DT::DTOutput("SDFGGWRbasic")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Robust GWR model'",
+                                                    helpText(h3("SDF:")),
+                                                    DT::DTOutput("SDFGWRRobust")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Heteroskedastic GWR'",
+                                                    helpText(h3("SDF:")),
+                                                    DT::DTOutput("SDFGWRhetero")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Mixed GWR'",
+                                                    helpText(h3("SDF:")),
+                                                    DT::DTOutput("SDFGWRmixed")),
+                                   conditionalPanel(condition ="input.Selectgwr == 'Scalable GWR'",
+                                                    helpText(h3("SDF:")),
+                                                    DT::DTOutput("SDFGWRscalable"))
                       ),
                       tabPanel(
                         "Plot",
+                        conditionalPanel(
+                          condition = "input.Selectgwr == 'Local collinearity diagnostics'",
+                          helpText("click in Dropdown Button for
+                                   customize and download plot"),
+                          shinyWidgets::dropdown(
+                            tags$h3("List of Input"),
+                            selectInput('plotgwrd',
+                                        'Select',
+                                        choices = NULL),
+                            textInput("maingwrd",
+                                      label = "Main title",
+                                      value = "Write main title..."),
+                            shinyWidgets::pickerInput(
+                              inputId = "colorgwrd",
+                              label = "Select pallete",
+                              choices = Pallete_color),
+                            br(),
+                            helpText(h4("North arrow position")),
+                            numericInput("latgwrd",
+                                         "Latitude",
+                                         min = -90,
+                                         max = 90,
+                                         value = 32),
+                            numericInput("scalegwrd",
+                                         "scale Arrow",
+                                         min = 1,
+                                         max = 10,
+                                         value = 3),
+                            numericInput("longwrd",
+                                         "Longitude",
+                                         min = -180,
+                                         max = 180,
+                                         value = -74),
+                            shinyWidgets::actionBttn(
+                              inputId = "Runplotgwrd",
+                              label = "Plot",
+                              style = "float",
+                              color = "success"),
+                            radioButtons("butdowngwrd",
+                                         "Select the Option",
+                                         choices = list("png",
+                                                        "pdf")),
+                            downloadButton(
+                              outputId = "downgwrd",
+                              label = "Download the plot"),
+                            style = "unite",
+                            #icon = icon("gear"),
+                            status = "primary",
+                            width = "300px",
+                            animate = shinyWidgets::animateOptions(
+                              enter = animations$fading_entrances$fadeInLeftBig,
+                              exit = animations$fading_exits$fadeOutRightBig))),
                         conditionalPanel(
                           condition = "input.Selectgwr == 'Basic GWR model'",
                           helpText("click in Dropdown Button for
@@ -1394,7 +1552,7 @@ background-color: #69c3ff;}
                                          "Latitude",
                                          min = -90,
                                          max = 90,
-                                         value = 28),
+                                         value = 32),
                             numericInput("scalegwr",
                                          "scale Arrow",
                                          min = 1,
@@ -1404,7 +1562,7 @@ background-color: #69c3ff;}
                                          "Longitude",
                                          min = -180,
                                          max = 180,
-                                         value = -70),
+                                         value = -74),
                             shinyWidgets::actionBttn(
                               inputId = "Runplotgwr",
                               label = "Plot",
@@ -1446,7 +1604,7 @@ background-color: #69c3ff;}
                                    "Latitude",
                                    min = -90,
                                    max = 90,
-                                   value = 28),
+                                   value = 32),
                       numericInput("scaleggwr",
                                    "scale Arrow",
                                    min = 1,
@@ -1496,7 +1654,7 @@ background-color: #69c3ff;}
             numericInput("latRgwr", "Latitude",
                          min = -90,
                          max = 90,
-                         value = 28),
+                         value = 32),
             numericInput("scaleRgwr",
                          "scale Arrow",
                          min = 1,
@@ -1506,7 +1664,7 @@ background-color: #69c3ff;}
                          "Longitude",
                          min = -180,
                          max = 180,
-                         value = -70),
+                         value = -74),
             shinyWidgets::actionBttn(
               inputId = "RunplotRgwr",
               label = "Plot",
@@ -1545,7 +1703,7 @@ background-color: #69c3ff;}
                      "Latitude",
                      min = -90,
                      max = 90,
-                     value = 28),
+                     value = 32),
         numericInput("scaleHgwr",
                      "scale Arrow",
                      min = 1,
@@ -1555,7 +1713,7 @@ background-color: #69c3ff;}
                      "Longitude",
                      min = -180,
                      max = 180,
-                     value = -70),
+                     value = -74),
         shinyWidgets::actionBttn(
           inputId = "RunplotHgwr",
           label = "Plot",
@@ -1593,7 +1751,7 @@ background-color: #69c3ff;}
         numericInput("latMgwr", "Latitude",
                      min = -90,
                      max = 90,
-                     value = 28),
+                     value = 32),
         numericInput("scaleMgwr",
                      "scale Arrow",
                      min = 1,
@@ -1603,7 +1761,7 @@ background-color: #69c3ff;}
                      "Longitude",
                      min = -180,
                      max = 180,
-                     value = -70),
+                     value = -74),
         shinyWidgets::actionBttn(
           inputId = "RunplotMgwr",
           label = "Plot",
@@ -1641,7 +1799,7 @@ background-color: #69c3ff;}
                      "Latitude",
                      min = -90,
                      max = 90,
-                     value = 28),
+                     value = 32),
         numericInput("scaleSgwr",
                      "scale Arrow",
                      min = 1,
@@ -1651,7 +1809,7 @@ background-color: #69c3ff;}
                      "Longitude",
                      min = -180,
                      max = 180,
-                     value = -70),
+                     value = -74),
         shinyWidgets::actionBttn(
           inputId = "RunplotSgwr",
           label = "Plot",
@@ -1669,6 +1827,8 @@ background-color: #69c3ff;}
         animate = shinyWidgets::animateOptions(
           enter = animations$fading_entrances$fadeInLeftBig,
           exit = animations$fading_exits$fadeOutRightBig))),
+    conditionalPanel(condition = "input.Selectgwr == 'Local collinearity diagnostics'",
+                     plotOutput("mapgwrbasicd") ),
     conditionalPanel(condition = "input.Selectgwr == 'Basic GWR model'",
                      plotOutput("mapgwrbasic") ),
     conditionalPanel( condition = "input.Selectgwr == 'Scalable GWR'",
@@ -1681,9 +1841,9 @@ background-color: #69c3ff;}
                       plotOutput("mapRgwr")),
     conditionalPanel( condition = "input.Selectgwr == 'Generalised GWR models'",
                       plotOutput("mapggwr"))
-))))),
+))))))),
 shinydashboard::tabItem(
-  tabName = "tab53",
+  tabName = "tab53",fluidRow(column(width = 12,
   shinydashboard::box(
     width = 12,
     title = "Geographically Weighted Principal Components Analysis",
@@ -1815,7 +1975,7 @@ shinydashboard::tabItem(
                               "Latitude",
                               min = -90,
                               max = 90,
-                              value = 28
+                              value = 32
                               ),
                  numericInput("scalegwpca",
                               "scale Arrow",
@@ -1827,7 +1987,7 @@ shinydashboard::tabItem(
                               "Longitude",
                               min = -180,
                               max = 180,
-                              value = -70),
+                              value = -74),
                  shinyWidgets::actionBttn(
                    inputId = "RunplotVgwr",
                    label = "Plot",
@@ -1871,7 +2031,7 @@ shinydashboard::tabItem(
                        "Latitude",
                        min = -90,
                        max = 90,
-                       value = 28),
+                       value = 32),
           numericInput("scalewingwpca",
                        "scale Arrow",
                        min = 1,
@@ -1881,7 +2041,7 @@ shinydashboard::tabItem(
                        "Longitude",
                        min = -180,
                        max = 180,
-                       value = -70),
+                       value = -74),
           shinyWidgets::actionBttn(
             inputId = "Runplotwingwpca",
             label = "Plot",
@@ -1902,16 +2062,16 @@ shinydashboard::tabItem(
         plotOutput("wingwpca",width = "100%"))
 
                                       )
-                ))),
+                ))))),
 shinydashboard::tabItem(
-  tabName = "tab54",
+  tabName = "tab54",fluidRow(column(width = 12,
   shinydashboard::box(
     width = 12,
     title = "Geographically Weighted Discriminant Analysis",
     status = "primary",
     solidHeader = TRUE,
     collapsible = TRUE,
-    height = 4000,
+    height = 400,
     sidebarPanel(shinyWidgets::actionBttn(
       "helpgwda",
       "Help",
@@ -2045,13 +2205,13 @@ shinydashboard::tabItem(
                        "Latitude",
                        min = -90,
                        max = 90,
-                       value = 28),
+                       value = 32),
           numericInput(
             "longwda",
             "Longitude",
             min = -180,
             max = 180,
-            value = -70),
+            value = -74),
           numericInput(
             "scalegwda",
             "scale North arrow ",
@@ -2075,7 +2235,144 @@ shinydashboard::tabItem(
             enter = animations$fading_entrances$fadeInLeftBig,
             exit = animations$fading_exits$fadeOutRightBig)),
         plotOutput("mapgwda"))))
-                    ))
+                    )))),
+shinydashboard::tabItem(tabName = "tab6",
+                        fluidRow(column(width = 12,shinydashboard::box(
+                          width = 12,
+                          title = "Spatial autocorrelation",
+                          status = "primary",
+                          solidHeader = TRUE,
+                          collapsible = TRUE,
+                          height = 5000,
+                          sidebarPanel(shinyWidgets::actionBttn(
+                            "helpauto",
+                            "Help",
+                            icon = icon("question-circle"),
+                            style = "stretch",
+                            block = FALSE,
+                            color = "primary"),
+                            shinyBS::bsModal(id="helpautoc",
+                                             title = "",
+                                             trigger = "helpauto",
+                                             size="large",
+                                             tags$iframe(
+                                               src = "Help_Autocorrelation.html",
+                                               width = "100%",
+                                               height = "1000px",
+                                               frameborder = 0,
+                                               scrolling = "auto" )),
+                                          pickerInput('varauto',
+                                           'Variable',
+                                           choices = NULL
+                                           ),
+                            br(),
+                            helpText(h4("neighbourhood weights list option")),
+                            shinyWidgets::switchInput("Zero.policy",
+                                                      inputId = "zeropolicy1",
+                                                      onLabel = "TRUE",
+                                                      offLabel = "FALSE",
+                                                      size = "mini"),
+                            radioButtons("style",
+                                         label = "Style",
+                                         choices = list("W" = "W",
+                                                        "B" = "B",
+                                                        "C" = "C",
+                                                        "U"= "U",
+                                                        "minmax"= "minmax",
+                                                        "S"="S"
+                                         ), selected = "W"),
+                            br(),
+                            helpText(h4("Global and local Moran option")),
+                            numericInput("numsim",
+                                         label = "Number of permutations",
+                                         value = 500),
+                            radioButtons("alternative",
+                                         label = "alternative",
+                                         choices = list("greater"="greater",
+                                                        "less"= "less",
+                                                        "two.sided"= "two.sided"),
+                                         selected = "greater"),
+                            shinyalert::useShinyalert(),
+                          shinyjs::useShinyjs(),
+                          shinyWidgets::actionBttn(
+                            inputId = "Runauto",
+                            label = "Run",
+                            style = "float",
+                            block = TRUE,
+                            color = "danger")),
+                          mainPanel(tabsetPanel(
+                            tabPanel(
+                              "Summary",
+                              br(),
+                              verbatimTextOutput("variablename"),
+                              br(),
+                              helpText( "Moran I test under randomisation"),
+                              verbatimTextOutput("moran"),
+                              helpText( "Monte-Carlo simulation of Moran I"),
+                              verbatimTextOutput("moranmc"),
+                              helpText( "Local Moran's I statistic summary"),
+                              verbatimTextOutput("localmoran"),
+                              helpText( "Monte-Carlo simulation of Local Moran's I statistic summary"),
+                              verbatimTextOutput("localmoranperm"),
+                              br(),
+                              helpText( "Local Moran's I statistic"),
+                              DT::DTOutput("DFauto"),
+                            ),
+                            tabPanel(
+                              "Plot",
+                              helpText("click in Dropdown Button for customize and download plot"),
+                              shinyWidgets::dropdown(
+                                tags$h3("List of Input"),
+                                selectInput('plotauto',
+                                            'Select',
+                                            choices = c("lmoran_i" = "lmoran_i",
+                                                        "lmoran_p" = "lmoran_p")),
+
+                                shinyWidgets::pickerInput(
+                                  inputId = "colorauto",
+                                  label = "Select pallete",
+                                  choices = Pallete_color),
+                                br(),
+                                helpText(h4("North arrow position")),
+                                numericInput("latauto",
+                                             "Latitude",
+                                             min = -90,
+                                             max = 90,
+                                             value = 32),
+                                numericInput(
+                                  "longauto",
+                                  "Longitude",
+                                  min = -180,
+                                  max = 180,
+                                  value = -74),
+                                numericInput(
+                                  "scaleauto",
+                                  "scale North arrow ",
+                                  min = 1,
+                                  max = 20,
+                                  value = 3),
+                                shinyWidgets::actionBttn(
+                                  inputId = "Runplotauto",
+                                  label = "Plot",
+                                  style = "float",
+                                  color = "success"),
+                                radioButtons("butdownauto",
+                                             "Select the Option",
+                                             choices = list("png","pdf")),
+                                downloadButton(outputId = "downgauto",
+                                               label = "Download the plot"),
+                                style = "unite",
+                                #icon = icon("gear"),
+                                status = "primary", width = "300px",
+                                animate = shinyWidgets::animateOptions(
+                                  enter = animations$fading_entrances$fadeInLeftBig,
+                                  exit = animations$fading_exits$fadeOutRightBig)),
+                              plotOutput("mapauto"))
+                          ))
+
+                                        )))
+
+                        )# fintab6
     )#fintabitemS
   )# findashboardbody
 

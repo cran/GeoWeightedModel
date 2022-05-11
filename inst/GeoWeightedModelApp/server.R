@@ -6,9 +6,9 @@ shiny::shinyServer(function(input,output,session) {
   #--------------# Upload example #---------------#
   output$example <- DT::renderDT({
     if(input$example == FALSE){return()}
-    data(USelect)
-    data <- USelect2004@data
-    DT::datatable(data, options = list(
+      data(USelect)
+      data <- USelect2004@data
+      DT::datatable(data, options = list(
       pageLength = 5,
       scrollCollapse = T,
       scrollX = TRUE,
@@ -188,7 +188,7 @@ shiny::shinyServer(function(input,output,session) {
   observe({
     if(input$example== TRUE){
     updateSelectizeInput(session,
-                         'dependientgwr', 'Dependiente',
+                         'dependientgwr', 'Dependent',
                          choices =  USelect2004@data %>%
                            dplyr::select_if(is.numeric)%>% names,
                          #multiple = TRUE,
@@ -207,7 +207,7 @@ shiny::shinyServer(function(input,output,session) {
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientgwr', 'Dependiente',
+                         'dependientgwr', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -224,7 +224,7 @@ shiny::shinyServer(function(input,output,session) {
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientggwr', 'Dependiente',
+                         'dependientggwr', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -241,7 +241,7 @@ shiny::shinyServer(function(input,output,session) {
   observe({
     if(input$example == TRUE){
       updateSelectizeInput(session,
-                         'depbwgda', 'Dependiente',
+                         'depbwgda', 'Dependent',
                          choices =  USelect2004@data%>%
                            dplyr::select_if(is.factor) %>% names,
                          #multiple = TRUE,
@@ -251,7 +251,7 @@ shiny::shinyServer(function(input,output,session) {
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.factor) %>% names
     updateSelectizeInput(session,
-                         'depbwgda', 'Dependiente',
+                         'depbwgda', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE)
@@ -608,7 +608,7 @@ else if (input$example == TRUE){
     if(input$example == FALSE){
       polys <- list("sp.lines", as(z$map, "SpatialLines"),
                     col="lightgrey", lwd=.5,lty=0.1)
-      col.palette <- cartography::carto.pal(input$colorgwss, 10)
+      col.palette <- cartography::carto.pal(input$colorgwss, 20)
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwss,input$latgwss),
                     scale = input$scalegwss, col=1)
@@ -620,7 +620,7 @@ else if (input$example == TRUE){
                                col.regions = col.palette)
       values$plotgwss}
     else if (input$example == TRUE){
-      col.palette <- cartography::carto.pal(input$colorgwss, 10)
+      col.palette <- cartography::carto.pal(input$colorgwss,20)
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwss,input$latgwss),
                     scale = input$scalegwss, col=1)
@@ -667,12 +667,248 @@ output$downgwss <- downloadHandler(
     }
   )
 
+#-----------------------------gwr Collin---------------------------------------
+observe({
+  if(input$example == TRUE){
+    updateSelectizeInput(session,
+                         'dependientbgwrd', 'Dependent',
+                         choices = USelect2004@data %>%
+                           dplyr::select_if(is.numeric)%>% names,
+                         #multiple = TRUE,
+                         server = TRUE
+    )}
+})
+observe({
+  if(input$example == TRUE){
+    updateSelectizeInput(session,
+                         'independientbgwrd', 'Independient(s)',
+                         choices = USelect2004@data %>%
+                           dplyr::select_if(is.numeric)%>% names,
+                         #multiple = TRUE,
+                         server = TRUE)}
+})
+
+observe({
+  req(z$dat)
+  ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
+  updateSelectizeInput(session,
+                       'dependientbgwrd', 'Dependent',
+                       choices = ovars,
+                       #multiple = TRUE,
+                       server = TRUE
+  )
+})
+
+observe({
+  req(z$dat)
+  ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
+  updateSelectizeInput(session,
+                       'independientbgwrd', 'Independient(s)',
+                       choices = ovars,
+                       #multiple = TRUE,
+                       server = TRUE)
+})
+
+
+observe({
+  if (isTRUE(is.null(input$independientbgwrd))) {
+    shinyjs::disable("Runbgwrd")
+  }
+  else {shinyjs::enable("Runbgwrd")
+  }
+})
+
+observeEvent(input$Runbgwrd, {
+  req(values$dMat)
+  req(input$independientbgwrd)
+  shinybusy::show_modal_spinner(
+    spin = "atom",
+    color = "red",
+    text = "Please wait...Work in progress. You'll have to be
+      patient, because the result may take a while"
+  )
+  if(input$example == FALSE){
+    formu <- as.formula(paste(input$dependientbgwrd,"~",
+                              paste(input$independientbgwrd,collapse="+")))
+    if( input$selbgwrd == "Automatic"){
+      values$gwr.collin <- GWmodel::gwr.collin.diagno(formula = formu,
+                                                      data = datasel(),
+                                                      bw = values$bw,
+                                                      kernel = input$kernelbgwrd,
+                                                      adaptive = input$adaptativebgwrd,
+                                                      p = input$powerbgwrd,
+                                                      theta = input$thetabgwrd*pi,
+                                                      longlat = input$longlatbgwrd,
+                                                      dMat = values$dMat
+                                                      # parallel.method = "cluster"
+      )
+    }
+    else { values$gwr.collin <- GWmodel::gwr.collin.diagno(
+      formula = formu,data = datasel(),
+      bw = input$bwbgwrd,
+      kernel = input$kernelbgwrd,
+      adaptive = input$adaptativebgwrd,
+      p = input$powerbgwrd,
+      theta = input$thetabgwrd*pi,
+      longlat = input$longlatbgwrd,
+      dMat = values$dMat
+      # parallel.method = "cluster"
+    )
+    }}
+  else if(input$example == TRUE){
+    formu <- as.formula(paste(input$dependientbgwrd,"~",
+                              paste(input$independientbgwrd,collapse="+")))
+    if( input$selbgwrd == "Automatic"){
+      values$gwr.collin <- GWmodel::gwr.collin.diagno(formula = formu,
+                                                      data = USelect2004,
+                                                      bw = values$bw,
+                                                      kernel = input$kernelbgwrd,
+                                                      adaptive = input$adaptativebgwrd,
+                                                      p = input$powerbgwrd,
+                                                      theta = input$thetabgwrd*pi,
+                                                      longlat = input$longlatbgwrd,
+                                                      dMat = values$dMat
+                                                      # parallel.method = "cluster"
+      )
+    }
+    else if (input$selbgwrd == "Manual"){
+      values$gwr.collin <- GWmodel::gwr.collin.diagno(
+      formula = formu,
+      data = USelect2004,
+      bw = input$bwbgwrd,
+      kernel = input$kernelbgwrd,
+      adaptive = input$adaptativebgwrd,
+      p = input$powerbgwrd,
+      theta = input$thetabgwrd*pi,
+      longlat = input$longlatbgwrd,
+      dMat = values$dMat
+      )}
+    }
+
+  shinyWidgets::closeSweetAlert(session = session)
+  shinyWidgets::sendSweetAlert(
+    session = session,
+    title =" Calculation completed !",
+    type = "success"
+  )
+  beepr::beep(2)
+  shinybusy::remove_modal_spinner()
+})
+
+
+#DT::DTOutput("gwrbasicdlocalCN"),
+#DT::DTOutput("gwrbasicdlocalVDP"),
+#DT::DTOutput("gwrbasicdlocalcorr.mat")
+
+output$gwrbasicdVIF <- DT::renderDT({
+  req(values$gwr.collin)
+  datgwr <- data.frame(values$gwr.collin$SDF)
+  datgwr1 <- datgwr %>% dplyr:: select(ends_with("_VIF") | starts_with("SDF.local_CN"))
+  datgwr2 <- datgwr %>% dplyr:: select(ends_with("_VDP") | starts_with("SDF.Corr_"))
+  datgwrd <- merge(datgwr1,datgwr2)
+  datgwrd <- datgwrd %>% mutate_if(is.numeric,round, digits = 6)
+
+  DT::datatable(data =  datgwrd, extensions = 'Buttons',
+                options = list(dom = 'Bfrtip',
+                               scrollX = TRUE,
+                               fixedColumns = TRUE,
+                               buttons = c('pageLength',
+                                           'copy',
+                                           'csv',
+                                           'excel',
+                                           'pdf',
+                                           'print'),
+                               pagelength = 10,
+                               lengthMenu = list(c(10, 25, 100, -1),
+                                                 c('10', '25', '100','All'))))
+})
+
+
+observe({
+  req(values$gwr.collin)
+  datgwr <- data.frame(values$gwr.collin$SDF)
+  datgwr1 <- datgwr %>% dplyr:: select(ends_with("_VIF") | starts_with("SDF.local_CN"))
+  datgwr2 <- datgwr %>% dplyr:: select(ends_with("_VDP") | starts_with("SDF.Corr_"))
+  datgwrd <- merge(datgwr1,datgwr2)
+  datgwrd <- datgwrd %>% mutate_if(is.numeric,
+              round,
+              digits = 6)
+
+  vargwsd <- names(datgwrd)
+
+  updateSelectInput(session,'plotgwrd',
+                    'Select', choices = vargwsd)
+})
+
+observeEvent(input$Runplotgwrd, {
+  if(input$example == FALSE){
+    req(values$gwr.collin$SDF)
+    polys <- list("sp.lines", as(z$map, "SpatialLines"), col="lightgrey",
+                  lwd=.5,lty=0.1)
+    map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
+                   offset = c(input$longwrd,input$latgwrd),
+                   scale = input$scalegwrd, col=1)
+    col.palette <- cartography::carto.pal(input$colorgwrd, 20)
+    values$plotgwrd <-sp::spplot(values$gwr.collin$SDF,input$plotgwrd,
+                                 main = input$maingwrd,
+                                 sp.layout=list(polys,map.na),
+                                 scales=list(cex = 1, col="black"),
+                                 col="transparent",
+                                 col.regions = col.palette)
+    values$plotgwrd}
+  else if(input$example == TRUE){
+    map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
+                   offset = c(input$longwrd,input$latgwrd),
+                   scale = input$scalegwrd, col=1)
+    col.palette <- cartography::carto.pal(input$colorgwrd, 20)
+    values$plotgwrd <-sp::spplot(values$gwr.collin$SDF,input$plotgwrd,
+                                 main = input$maingwrd,
+                                 sp.layout=list(map.na),
+                                 scales=list(cex = 1, col="black"),
+                                 col="transparent",
+                                 col.regions = col.palette)
+    values$plotgwrd
+  }
+
+})
+
+observe({
+  if (isTRUE(is.null(values$plotgwrd))) {
+    shinyjs::disable("downgwrd")
+  }
+  else {shinyjs::enable("downgwrd")
+  }
+})
+
+output$mapgwrbasicd <- renderPlot({
+  values$plotgwrd
+},height = 700, width = 700)
+
+
+output$downgwrd <- downloadHandler(
+  filename =  function() {
+    paste("GeoWeithedModel",input$butdowngwrd, sep=".")
+  },
+
+  content = function(file) {
+    if(input$butdowngwrd == "png")
+      png(file) # open the png device
+    else
+      pdf(file) # open the pdf device
+    print(values$plotgwrd) # draw the plot
+    dev.off()  # turn the device off
+
+  }
+)
+
+
+
   #-----------------------------gwr.basic---------------------------------------
 
 observe({
  if(input$example == TRUE){
   updateSelectizeInput(session,
-                       'dependientbgwr', 'Dependiente',
+                       'dependientbgwr', 'Dependent',
                        choices = USelect2004@data %>%
                          dplyr::select_if(is.numeric)%>% names,
                        #multiple = TRUE,
@@ -693,7 +929,7 @@ observe({
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientbgwr', 'Dependiente',
+                         'dependientbgwr', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -842,7 +1078,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwr,input$latgwr),
                     scale = input$scalegwr, col=1)
-      col.palette <- cartography::carto.pal(input$colorgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorgwr, 20)
       values$plotgwr <-sp::spplot(values$gwr.basic$SDF,input$plotgwr,
                               main = input$maingwr,
                               sp.layout=list(polys,map.na),
@@ -854,7 +1090,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwr,input$latgwr),
                     scale = input$scalegwr, col=1)
-      col.palette <- cartography::carto.pal(input$colorgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorgwr, 20)
       values$plotgwr <-sp::spplot(values$gwr.basic$SDF,input$plotgwr,
                               main = input$maingwr,
                               sp.layout=list(map.na),
@@ -900,7 +1136,7 @@ observe({
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientGGWR', 'Dependiente',
+                         'dependientGGWR', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -1014,7 +1250,7 @@ observe({
     req(values$ggwr.basic$SDF)
     polys <- list("sp.lines", as(z$map, "SpatialLines"), col="lightgrey",
                   lwd=.5,lty=0.1)
-    col.palette <- cartography::carto.pal(input$colorggwr, 10)
+    col.palette <- cartography::carto.pal(input$colorggwr, 20)
     map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                   offset = c(input$longgwr,input$latggwr), scale = 1, col=1)
     values$plotggwr <-sp::spplot(values$ggwr.basic$SDF,input$plotggwr,
@@ -1059,7 +1295,7 @@ observe({
   observe({
     if(input$example == TRUE){
       updateSelectizeInput(session,
-                         'dependientRobust', 'Dependiente',
+                         'dependientRobust', 'Dependent',
                          choices = USelect2004@data %>%
                            dplyr::select_if(is.numeric)%>% names,
                          #multiple = TRUE,
@@ -1080,7 +1316,7 @@ observe({
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientRobust', 'Dependiente',
+                         'dependientRobust', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -1228,7 +1464,7 @@ observe({
     req(values$gwr.robust$SDF)
     polys <- list("sp.lines", as(z$map, "SpatialLines"),
                   col="lightgrey", lwd=.5,lty=0.1)
-    col.palette <- cartography::carto.pal(input$colorRgwr, 10)
+    col.palette <- cartography::carto.pal(input$colorRgwr, 20)
     map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                   offset = c(input$lonRgwr,input$latRgwr),
                   scale = input$scaleRgwr, col=1)
@@ -1240,7 +1476,7 @@ observe({
                              col.regions = col.palette)
     values$plotRgwr}
     else if(input$example == TRUE){
-      col.palette <- cartography::carto.pal(input$colorRgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorRgwr, 20)
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$lonRgwr,input$latRgwr),
                     scale = input$scaleRgwr, col=1)
@@ -1284,7 +1520,7 @@ observe({
   observe({
     if(input$example == TRUE){
       updateSelectizeInput(session,
-                         'dependienthetero', 'Dependiente',
+                         'dependienthetero', 'Dependent',
                          choices = USelect2004@data %>%
                            dplyr::select_if(is.numeric)%>% names,
                          #multiple = TRUE,
@@ -1305,7 +1541,7 @@ observe({
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependienthetero', 'Dependiente',
+                         'dependienthetero', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -1457,7 +1693,7 @@ observe({
                   lwd=.5,lty=0.1)
     map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                   offset = c(input$lonHgwr,input$latHgwr), scale = 1, col=1)
-    col.palette <- cartography::carto.pal(input$colorHgwr, 10)
+    col.palette <- cartography::carto.pal(input$colorHgwr, 20)
     values$plotHgwr <-sp::spplot(values$gwr.hetero,input$plotHgwr,
                              main = input$mainHgwr,
                              sp.layout=list(polys,map.na),
@@ -1469,7 +1705,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$lonHgwr,input$latHgwr),
                     scale = input$scaleHgwr, col=1)
-      col.palette <- cartography::carto.pal(input$colorHgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorHgwr, 20)
       values$plotHgwr <-sp::spplot(values$gwr.hetero,input$plotHgwr,
                                main = input$mainHgwr,
                                sp.layout=list(map.na),
@@ -1513,7 +1749,7 @@ observe({
   observe({
     if(input$example == TRUE){
     updateSelectizeInput(session,
-                         'dependientmixed', 'Dependiente',
+                         'dependientmixed', 'Dependent',
                          choices = USelect2004@data %>%
                            dplyr::select_if(is.numeric)%>% names,
                          #multiple = TRUE,
@@ -1544,7 +1780,7 @@ observe({
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientmixed', 'Dependiente',
+                         'dependientmixed', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -1709,7 +1945,7 @@ observe({
                     lwd=.5,lty=0.1)
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$lonMgwr,input$latMgwr), scale = 1, col=1)
-      col.palette <- cartography::carto.pal(input$colorMgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorMgwr, 20)
       values$plotMgwr <-sp::spplot(values$gwr.mixed$SDF,input$plotMgwr,
                                main = input$mainMgwr,
                                sp.layout=list(polys,map.na),
@@ -1721,7 +1957,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$lonMgwr,input$latMgwr),
                     scale = input$scaleMgwr, col=1)
-      col.palette <- cartography::carto.pal(input$colorMgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorMgwr, 20)
       values$plotMgwr <-sp::spplot(values$gwr.mixed$SDF,input$plotMgwr,
                                main = input$mainMgwr,
                                sp.layout=list(map.na),
@@ -1764,7 +2000,7 @@ observe({
   observe({
     if(input$example == TRUE){
       updateSelectizeInput(session,
-                         'dependientscal', 'Dependiente',
+                         'dependientscal', 'Dependent',
                          choices = USelect2004@data %>%
                            dplyr::select_if(is.numeric)%>% names,
                          #multiple = TRUE,
@@ -1786,7 +2022,7 @@ observe({
     req(z$dat)
     ovars <- z$dat %>% dplyr::select_if(is.numeric) %>% names
     updateSelectizeInput(session,
-                         'dependientscal', 'Dependiente',
+                         'dependientscal', 'Dependent',
                          choices = ovars,
                          #multiple = TRUE,
                          server = TRUE
@@ -1898,7 +2134,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$lonSgwr,input$latSgwr),
                     scale = input$scaleSgwr, col=1)
-      col.palette <- cartography::carto.pal(input$colorSgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorSgwr, 20)
       values$plotSgwr <-sp::spplot(values$gwr.scalable$SDF,
                                input$plotSgwr, main = input$mainSgwr,
                                sp.layout=list(polys,map.na),
@@ -1910,7 +2146,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$lonSgwr,input$latSgwr),
                     scale = input$scaleSgwr, col=1)
-      col.palette <- cartography::carto.pal(input$colorSgwr, 10)
+      col.palette <- cartography::carto.pal(input$colorSgwr, 20)
       values$plotSgwr <-sp::spplot(values$gwr.scalable$SDF,
                                input$plotSgwr, main = input$mainSgwr,
                                sp.layout=list(map.na),
@@ -2145,7 +2381,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwpca,input$latgwpca),
                     scale = input$scalegwpca, col=1)
-      col.palette <- cartography::carto.pal(input$colorVgwpca, 10)
+      col.palette <- cartography::carto.pal(input$colorVgwpca, 20)
       values$plotVgwpca <- sp::spplot(mf,"var.gwpca", main = input$mainVgwpca,
                                  sp.layout=list(polys,map.na),
                                  scales=list(cex = 1, col="black"),
@@ -2160,7 +2396,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwpca,input$latgwpca),
                     scale = input$scalegwpca, col=1)
-      col.palette <- cartography::carto.pal(input$colorVgwpca, 10)
+      col.palette <- cartography::carto.pal(input$colorVgwpca, 20)
       values$plotVgwpca <- sp::spplot(mf,"var.gwpca", main = input$mainVgwpca,
                                  sp.layout=list(map.na),
                                  scales=list(cex = 1, col="black"),
@@ -2481,7 +2717,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwda,input$latgwda),
                     scale = input$scalegwda, col=1)
-      col.palette <- cartography::carto.pal(input$colorgwda, 10)
+      col.palette <- cartography::carto.pal(input$colorgwda, 20)
       values$plotgwda <- sp::spplot(values$gwda$SDF,input$plotgwda,
                                main = input$maingwda,
                                sp.layout=list(map.na),
@@ -2496,7 +2732,7 @@ observe({
       map.na <- list("SpatialPolygonsRescale", layout.north.arrow(),
                     offset = c(input$longwda,input$latgwda),
                     scale = input$scalegwda, col=1)
-      col.palette <- cartography::carto.pal(input$colorgwda, 10)
+      col.palette <- cartography::carto.pal(input$colorgwda, 20)
       values$plotgwda <- sp::spplot(values$gwda$SDF,input$plotgwda,
                                main = input$maingwda,
                                sp.layout=list(polys,map.na),
@@ -2531,6 +2767,164 @@ observe({
       dev.off()  # turn the device off
     }
   )
+
+ #------------------------Autocorrelation----------------------
+
+  observe({
+    req(z$dat)
+    ovars <- names(z$dat)
+    updatePickerInput(session,
+                      'varauto',
+                      choices = ovars
+    )
+    })
+
+  observeEvent(input$Runauto, {
+    req(datasel())
+    datauto <- datasel()
+    Variable <- pull(dplyr::select(z$dat,input$varauto))
+    print(input$varauto)
+    shinybusy::show_modal_spinner(
+      spin = "atom",
+      color = "blue",
+      text = "Please wait...Work in progress. You'll have to be
+      patient, because the result may take a while")
+    neighbourhood <- spdep::poly2nb(datauto, queen= TRUE)
+    neighbourhood_weights_list <- spdep::nb2listw(neighbourhood,
+                                                  style=input$style,
+                                                  zero.policy= TRUE)
+
+    values$morantest <- spdep::moran.test(Variable,
+                                          neighbourhood_weights_list,
+                                          alternative = input$alternative)
+    values$moranmc <-  spdep::moran.mc(Variable,
+                                       neighbourhood_weights_list,
+                                       alternative= input$alternative,
+                                       nsim= input$numsim)
+    values$localmoran <- spdep::localmoran(Variable,
+                                           neighbourhood_weights_list,
+                                           p.adjust.method="bonferroni",
+                                           alternative = input$alternative,
+                                           na.action=na.exclude,
+                                           zero.policy = TRUE)
+    values$localmoranperm <- spdep::localmoran_perm(Variable,
+                                                    neighbourhood_weights_list,
+                                                    p.adjust.method="bonferroni",
+                                                    na.action=na.exclude,
+                                                    nsim= input$numsim,
+                                                    alternative = input$alternative,
+                                                    zero.policy = TRUE)
+    shinybusy::remove_modal_spinner()
+    beepr:: beep(2)
+  })
+
+  output$variablename<- renderPrint({
+    req(input$varauto)
+    print(input$varauto)
+  })
+
+  output$moran <- renderPrint({
+    req(values$morantest)
+    values$morantest
+  })
+
+  output$moranmc <- renderPrint({
+    req(values$moranmc)
+      values$moranmc
+  })
+
+  output$localmoran <- renderPrint({
+    req(values$localmoran)
+    summary(values$localmoran)
+  })
+
+  output$localmoranperm <- renderPrint({
+    req(values$localmoranperm)
+    summary(values$localmoranperm)
+  })
+
+  output$DFauto <-  DT::renderDT({
+    req(values$localmoran)
+    datmat <- data.frame(values$localmoran[,1:5])%>%
+      dplyr::mutate_if(is.numeric, round, digits = 6)
+    DT::datatable(data = datmat, extensions = 'Buttons',
+                  colnames = c("Ii","E.Ii","Var.Ii","Z.Ii","Pr.Z"),
+                options = list(dom = 'Bfrtip', scrollX = TRUE,
+                                 fixedColumns = TRUE,
+                                 buttons = c('pageLength',
+                                             'copy',
+                                             'csv',
+                                             'excel',
+                                             'pdf',
+                                             'print'),
+                                 pagelength = 10,
+                                 lengthMenu = list(c(10, 25, 100, -1),
+                                                   c('10', '25', '100','All'))))
+  })
+
+observeEvent(input$Runplotauto, {
+  req(values$localmoran)
+  SPDF <- datasel()
+  SPDF@data$lmoran_i <- values$localmoran[,1]
+  SPDF@data$lmoran_p <- values$localmoran[,5]
+  polys <- list("sp.lines", as(z$map,
+                               "SpatialLines"),
+                col="lightgrey", lwd=.5,lty=0.1)
+  col.palette <- cartography::carto.pal(input$colorauto, 20)
+  map.na <- list("SpatialPolygonsRescale",
+                 layout.north.arrow(),
+                 offset = c(input$longauto,input$latauto),
+                 scale = input$scaleauto, col=1)
+  if(input$plotauto == "lmoran_i"){
+    values$plotauto <- sp::spplot(SPDF, "lmoran_i",
+                                  main = "Local Moran's I",
+                                  sp.layout=list(polys,map.na),
+                                  scales=list(cex = 1, col="black"),
+                                  col="transparent",
+                                  col.regions = col.palette)
+    }
+  else if(input$plotauto == "lmoran_p"){
+    values$plotauto <- sp::spplot(SPDF, "lmoran_p",
+                                  main = "P-values",
+                                  sp.layout=list(polys,map.na),
+                                  scales=list(cex = 1, col="black"),
+                                  col="transparent",
+                                  col.regions = col.palette)
+    }
+  })
+
+
+
+  output$mapauto <- renderPlot({
+    req(values$plotauto)
+    values$plotauto
+  },height = 700, width = 700)
+
+
+  observe({
+    if (isTRUE(is.null(values$plotauto))) {
+      shinyjs::disable("downgauto")
+    }
+    else {shinyjs::enable("downgauto")
+    }
+  })
+
+  output$downgauto <- downloadHandler(
+    filename =  function() {
+      paste("GeoWeithedModel",input$butdownauto, sep=".")
+    },
+
+    content = function(file) {
+      if(input$butdownauto == "png")
+        png(file) # open the png device
+      else
+        pdf(file) # open the pdf device
+      print(values$plotauto) # draw the plot
+      dev.off()  # turn the device off
+
+    }
+  )
+
 
   }) #FIN
 
