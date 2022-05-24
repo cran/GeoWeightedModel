@@ -610,7 +610,7 @@ background-color: #69c3ff;}
           status = "primary",
           solidHeader = TRUE,
           collapsible = TRUE,
-          height = 4000,
+          height = 66000,
           sidebarPanel(shinyWidgets::actionBttn("helpgwss",
                                                 "Help",
                                                 icon = icon("question-circle"),
@@ -757,13 +757,13 @@ background-color: #69c3ff;}
               )
           ))))),
     shinydashboard::tabItem(
-      tabName = "tab52",fluidRow(column(width = 12,
+      tabName = "tab52",fluidRow(column(width = 12,height = 6000,
       shinydashboard::box(width = 12,
                           title = "Geographically Weighted Regression",
                           status = "primary",
                           solidHeader = TRUE,
                           collapsible = TRUE,
-                          height = 4000,
+                          height = 66000,
                           sidebarPanel(
                             shinyWidgets::actionBttn(
                               "helpgwr",
@@ -1091,15 +1091,7 @@ background-color: #69c3ff;}
                                       onLabel = "TRUE",
                                       offLabel = "FALSE",
                                       size = "mini")),
-                      div(style="display: inline-block;vertical-align:top;
-                          width: 100px;",
-                          shinyWidgets::switchInput("F123test",
-                                      inputId = "f123test",
-                                      onLabel = "TRUE",
-                                      offLabel = "FALSE",
-                                      size = "mini")),
-
-                      div(style="display: inline-block;vertical-align:top;
+                div(style="display: inline-block;vertical-align:top;
                           width: 100px;",
                           shinyWidgets::switchInput("Filtered",
                                       inputId = "filtered",
@@ -1850,7 +1842,7 @@ shinydashboard::tabItem(
     status = "primary",
     solidHeader = TRUE,
     collapsible = TRUE,
-    height = 4500,
+    height = 66000,
     sidebarPanel(shinyWidgets::actionBttn(
       "helpgwpca",
       "Help",
@@ -2071,7 +2063,7 @@ shinydashboard::tabItem(
     status = "primary",
     solidHeader = TRUE,
     collapsible = TRUE,
-    height = 400,
+    height = 66000,
     sidebarPanel(shinyWidgets::actionBttn(
       "helpgwda",
       "Help",
@@ -2180,9 +2172,10 @@ shinydashboard::tabItem(
       tabPanel(
         "Summary",
         verbatimTextOutput("gwda"),
+        helpText(h3("Confusion matrix")),
+        verbatimTextOutput("predict"),
         helpText(h3(" SDF")),
-        DT::DTOutput("DFgwda"),
-        verbatimTextOutput("predict")
+        DT::DTOutput("DFgwda")
         ),
       tabPanel(
         "Plot",
@@ -2243,7 +2236,7 @@ shinydashboard::tabItem(tabName = "tab6",
                           status = "primary",
                           solidHeader = TRUE,
                           collapsible = TRUE,
-                          height = 5000,
+                          height = 66000,
                           sidebarPanel(shinyWidgets::actionBttn(
                             "helpauto",
                             "Help",

@@ -802,11 +802,12 @@ observeEvent(input$Runbgwrd, {
 
 output$gwrbasicdVIF <- DT::renderDT({
   req(values$gwr.collin)
+
   datgwr <- data.frame(values$gwr.collin$SDF)
-  datgwr1 <- datgwr %>% dplyr:: select(ends_with("_VIF") | starts_with("SDF.local_CN"))
-  datgwr2 <- datgwr %>% dplyr:: select(ends_with("_VDP") | starts_with("SDF.Corr_"))
-  datgwrd <- merge(datgwr1,datgwr2)
-  datgwrd <- datgwrd %>% mutate_if(is.numeric,round, digits = 6)
+  datgwr1 <- datgwr %>% dplyr:: select(!starts_with("Corr_Intercept"))
+  #datgwr2 <- datgwr %>% dplyr:: select(ends_with("_VDP") | starts_with("SDF.Corr_"))
+  #datgwrd <- merge(datgwr1,datgwr2)
+  datgwrd <- datgwr1 %>% mutate_if(is.numeric,round, digits = 6)
 
   DT::datatable(data =  datgwrd, extensions = 'Buttons',
                 options = list(dom = 'Bfrtip',
@@ -827,10 +828,10 @@ output$gwrbasicdVIF <- DT::renderDT({
 observe({
   req(values$gwr.collin)
   datgwr <- data.frame(values$gwr.collin$SDF)
-  datgwr1 <- datgwr %>% dplyr:: select(ends_with("_VIF") | starts_with("SDF.local_CN"))
-  datgwr2 <- datgwr %>% dplyr:: select(ends_with("_VDP") | starts_with("SDF.Corr_"))
-  datgwrd <- merge(datgwr1,datgwr2)
-  datgwrd <- datgwrd %>% mutate_if(is.numeric,
+  datgwr1 <- datgwr %>% dplyr:: select(!starts_with("Corr_Intercept"))
+  #datgwr2 <- datgwr %>% dplyr:: select(ends_with("_VDP") | starts_with("SDF.Corr_"))
+  #datgwrd <- merge(datgwr1,datgwr2)
+  datgwrd <- datgwr1 %>% mutate_if(is.numeric,
               round,
               digits = 6)
 
@@ -1348,39 +1349,35 @@ observe({
       text = "Please wait...Work in progress. You'll have to be
       patient, because the result may take a while"
     )
-    if (input$example == FALSE){
-    formu <- as.formula(paste(input$dependientRobust," ~ ",
+    if (input$example == FALSE){formu <- as.formula(paste(input$dependientRobust," ~ ",
                               paste(input$independientRobust,collapse="+")))
-    if( input$selRobust == "Automatic"){
-      values$gwr.robust <- GWmodel::gwr.robust(formula = formu,
-                                      data = datasel(),
+    if( input$selRobust == "Automatic"){values$gwr.robust <- GWmodel::gwr.robust(formula = formu,
+                                                                                 data = datasel(),
                                       bw = values$bw,
                                       kernel = input$kernelRobust,
                                       adaptive = input$adaptativeRobust,
                                       delta  = 1e-05,
                                       filtered = input$filtered,
                                       maxiter = input$maxiterRobust,
+                                      #F123.test = input$f123test,
                                       p = input$powerRobust,
                                       theta = input$thetaRobust*pi,
                                       longlat = input$longlatRobust,
-                                      dMat = values$dMat
-
-      )
-    }
+                                      dMat = values$dMat)}
     else { values$gwr.robust <- GWmodel::gwr.robust(formula = formu,
                                            data = datasel(),
                                            bw = input$bwRobust,
                                            kernel = input$kernelRobust,
                                            adaptive = input$adaptativeRobust,
+                                           #F123.test = input$f123test,
                                            delta  = 1e-05,
                                            filtered = input$filtered,
                                            maxiter = input$maxiterRobust,
                                            p = input$powerRobust,
                                            theta = input$thetaRobust*pi,
                                            longlat = input$longlatRobust,
-                                           dMat = values$dMat
-    )
-    }}
+                                           dMat = values$dMat )}
+    }
     else if(input$example == TRUE){
      formu <- as.formula(paste(input$dependientRobust," ~ ",
                                paste(input$independientRobust,collapse="+")))
@@ -1392,6 +1389,7 @@ observe({
          kernel = input$kernelRobust,
          adaptive = input$adaptativeRobust,
          delta  = 1e-05,
+         #F123.test = input$f123test,
          filtered = input$filtered,
          maxiter = input$maxiterRobust,
          p = input$powerRobust,
@@ -1409,6 +1407,7 @@ observe({
        delta  = 1e-05,
        filtered = input$filtered,
        maxiter = input$maxiterRobust,
+       #F123.test = input$f123test,
        p = input$powerRobust,
        theta = input$thetaRobust*pi,
        longlat = input$longlatRobust,
@@ -2701,13 +2700,13 @@ observe({
   })
 
   # plot gwda
-
-  observe({
+    observe({
     req(values$gwda$SDF)
     vargws <- names(data.frame(values$gwda$SDF))
 
     updateSelectInput(session,'plotgwda',
-                      'Select', choices = vargws)
+                      'Select', choices = c("Original",
+                                            "group.predicted",vargws))
     })
 
   observeEvent(input$Runplotgwda, {
@@ -2718,13 +2717,36 @@ observe({
                     offset = c(input$longwda,input$latgwda),
                     scale = input$scalegwda, col=1)
       col.palette <- cartography::carto.pal(input$colorgwda, 20)
-      values$plotgwda <- sp::spplot(values$gwda$SDF,input$plotgwda,
+
+      if(input$plotgwda == "Original"){
+        USelect2004$winner <- factor(USelect2004$winner)
+        values$plotgwda <- sp::spplot(USelect2004,"winner",
                                main = input$maingwda,
                                sp.layout=list(map.na),
                                scales=list(cex = 1, col="black"),
                                col="transparent",
                                col.regions = col.palette)
+      values$plotgwda}
+      else if(input$plotgwda == "group.predicted"){
+        data <- values$gwda$SDF
+        data$group.predicted <- factor(data$group.predicted)
+        values$plotgwda <- sp::spplot(data,"group.predicted",
+                                      main = input$maingwda,
+                                      sp.layout=list(map.na),
+                                      scales=list(cex = 1, col="black"),
+                                      col="transparent",
+                                      col.regions = col.palette)
+        values$plotgwda}
+      else {
+        values$plotgwda <- sp::spplot(values$gwda$SDF,input$plotgwda,
+                                          main = input$maingwda,
+                                          sp.layout=list(map.na),
+                                          scales=list(cex = 1, col="black"),
+                                          col="transparent",
+                                          col.regions = col.palette)
       values$plotgwda
+     }
+
     }
     else if(input$example == FALSE){
       polys <- list("sp.lines", as(z$map, "SpatialLines"),
@@ -2775,8 +2797,7 @@ observe({
     ovars <- names(z$dat)
     updatePickerInput(session,
                       'varauto',
-                      choices = ovars
-    )
+                      choices = ovars)
     })
 
   observeEvent(input$Runauto, {

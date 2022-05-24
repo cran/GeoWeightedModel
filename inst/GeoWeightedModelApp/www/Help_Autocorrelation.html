@@ -261,22 +261,28 @@ body {color: #333333;}
 a, a:hover {color: #8B3A62;}
 pre {font-size: 12px;}
 </style>
+<div class="vembedr embed-responsive embed-responsive-16by9" align="center">
+<div class="vembedr-rounded">
+<iframe src="https://www.youtube.com/embed/i3OAaRR52Q8" width="533" height="300" frameborder="0" allowfullscreen data-external="1" class="embed-responsive-item"></iframe>
+</div>
+</div>
+<center>
+Video 1 : Spatial Autocorrelation
+</center>
 <div id="module-description" class="section level1">
 <h1>Module Description</h1>
 <p>“The first law of geography: Everything is related to everything
-else, but near things are more related than distant things.” Waldo R.
-Tobler (Tobler, 1970)</p>
-<p>A question often asked is whether or not features with similar values
-are clustered, randomly distributed or dispersed. Spatial
-autocorrelation measures the degree of correlation on space (Cliff and
-Ord 1973, 1981). Tests of spatial autocorrelation examine the
-independency of observed value in relation to values of that variable at
-neighboring locations.</p>
-<p>In this module calculates the Moran’s I Index value and both a a
-z-score and p-value to evaluate the significance of that Index. P-values
-are numerical approximations of the area under the curve for a known
+else, but near things are more related than distant things.”[1]. A
+question often asked is whether or not features with similar values are
+clustered, randomly distributed or dispersed. Spatial autocorrelation
+measures the degree of correlation on space [2]. Tests of spatial
+autocorrelation examine the independency of observed value in relation
+to values of that variable at neighboring locations. In this module, the
+value of the Moran’s I index and both the z-score and the p-value are
+calculated to assess the importance of that index. P-values are
+numerical approximations of the area under the curve for a known
 distribution, limited by the test statistic. We use the spdep package
-(Bivand, R. <em>et al.</em>, 2018)</p>
+[3]</p>
 </div>
 <div id="argument" class="section level1">
 <h1>Argument</h1>
@@ -285,7 +291,7 @@ neighbours list in listw.</p>
 <p><code>zero.policy</code>: default NULL, use global option value; if
 TRUE assign zero to the lagged value of zones without neighbours, if
 FALSE assign NA.</p>
-<p><code>style</code>: Starting from a binary neighbours list, in which
+<p><code>style</code>: starting from a binary neighbours list, in which
 regions are either listed as neighbours or are absent (thus not in the
 set of neighbours for some definition), the function adds a weights list
 with values given by the coding scheme style chosen. B is the basic
@@ -293,58 +299,52 @@ binary coding, W is row standardised (sums over all links to n), C is
 globally standardised (sums over all links to n), U is equal to C
 divided by the number of neighbours (sums over all links to unity),
 while S is the variance-stabilizing coding scheme proposed by
-Tiefelsdorf et al. 1999, p. 167-168 (sums over all links to n).</p>
-<p><code>nsim</code>: number of permutations</p>
+Tiefelsdorf et al. [4] (sums over all links to n). <code>nsim</code>:
+number of permutations.</p>
 <p><code>alternative</code>: a character string specifying the
-alternative hypothesis, must be one of “greater” (default),“less” or
-“less”.</p>
+alternative hypothesis, must be one of “greater” (default), “less” or
+“two.sided”.</p>
 </div>
 <div id="value" class="section level1">
 <h1>Value</h1>
-<p>A dataframes containing the following components: Moran I test under
+<p>A dataframe containing the following components: Moran I test under
 randomisation, Monte-Carlo simulation of Moran I, Local Moran’s I
 statistic summary, and Monte-Carlo simulation of Local Moran’s I
-statistic summary. Also the value of the standard deviate of Moran’s I,
-p.value the p-value of the test, the value of the observed Moran’s I,
-its expectation and variance under the method assumption.</p>
-<p>The Spatial Autocorrelation (Global Moran’s I) tool is an inferential
-statistic, which means that the results of the analysis are always
-interpreted within the context of its null hypothesis.</p>
+statistic summary. Also the value of the standard deviation of Moran’s
+I, p.value the p-value of the test, the value of the observed Moran’s I,
+its expectation and variance under the method assumption. The Spatial
+Autocorrelation (Global Moran’s I) tool is an inferential statistic,
+which means that the results of the analysis are always interpreted
+within the context of its null hypothesis. * When the p-value returned
+by this tool is statistically significant, you can reject the null
+hypothesis.</p>
 <ul>
-<li><p>When the p-value returned by this tool is statistically
-significant, you can reject the null hypothesis.</p></li>
-<li><p>When the p-value is not statistically significant You cannot
+<li><p>When the p-value is not statistically significant you cannot
 reject the null hypothesis. It is quite possible that the spatial
 distribution of feature values is the result of random spatial
 processes.</p></li>
 <li><p>If the p-value is statistically significant, and the z-score is
-positive.You may reject the null hypothesis. The spatial distribution of
-high values and/or low values in the dataset is more spatially clustered
-than would be expected if underlying spatial processes were
+positive, you may reject the null hypothesis. The spatial distribution
+of high values and/or low values in the dataset is more spatially
+clustered than would be expected if underlying spatial processes were
 random.</p></li>
+<li><p>If p-value is statistically significant, and the z-score is
+negative, you may reject the null hypothesis. The spatial distribution
+of high values and low values in the dataset is more spatially dispersed
+than would be expected if underlying spatial processes were
+random</p></li>
 </ul>
-<p>*If p-value is statistically significant, and the z-score is
-negative.You may reject the null hypothesis. The spatial distribution of
-high values and low values in the dataset is more spatially dispersed
-than would be expected if underlying spatial processes were random</p>
-</div>
-<div id="video" class="section level1">
-<h1>Video</h1>
-<div class="vembedr embed-responsive embed-responsive-16by9" align="center">
-<div class="vembedr-rounded">
-<iframe src="https://www.youtube.com/embed/4C8cy3C4BdE" width="533" height="300" frameborder="0" allowfullscreen data-external="1" class="embed-responsive-item"></iframe>
-</div>
-</div>
-<center>
-Video 1 : Spatial Autocorrelation
-</center>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>Bivand, Roger S. and Wong, David W. S. (2018) Comparing
+<p>[1] Tobler, W. R. 1970. A computer movie simulating urban growth in
+the Detroit region. Economic Geography, 46: 234–40.</p>
+<p>[2] Cliff, A. D., &amp; Ord, J. K. (1981). Spatial processes: models
+&amp; applications. Taylor &amp; Francis.</p>
+<p>[3] Bivand, Roger S. and Wong, David W. S. (2018) Comparing
 implementations of global and local indicators of spatial association
 <em>TEST</em>, 27(3), 716-748. URL <a href="https://doi.org/10.1007/s11749-018-0599-x" class="uri">https://doi.org/10.1007/s11749-018-0599-x</a></p>
-<p>Tiefelsdorf, M., Griffith, D. A., Boots, B. (1999). A
+<p>[4] Tiefelsdorf, M., Griffith, D. A., Boots, B. (1999). A
 variance-stabilizing coding scheme for spatial link matrices,
 Environment and Planning A, 31, pp. 165–180; Kelejian, H. H., and I. R.
 Prucha. 2010. Specification and estimation of spatial autoregressive
