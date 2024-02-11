@@ -1,5 +1,20 @@
 #' Shiny GUI for GeoWeightedModel package
 #'@import shiny
+#'@import beepr
+#'@importFrom DT DTOutput
+#'@importFrom DT renderDT
+#'@import GWmodel
+#'@import cartography
+#'@import dplyr
+#'@importFrom raster shapefile
+#'@import readxl
+#'@importFrom shinyBS bsModal
+#'@import shinyWidgets
+#'@importFrom shinyalert useShinyalert
+#'@import shinybusy
+#'@importFrom shinyjs useShinyjs
+#'@import sp
+#'@import spdep
 #'@import shinydashboard
 #'@description runGeoWeightedModel() loads interactive user interface built using R 'shiny'.
 #'@details The interactive user interface to provide an easy way for to perform techniques from a subset of

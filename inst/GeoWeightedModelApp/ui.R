@@ -1,22 +1,11 @@
-library(beepr)
-library(cartography)
-library(dplyr)
-library(DT)
-library(GWmodel)
-library(raster)
-library(readxl)
-library(shiny)
-library(shinyalert)
-library(shinyBS)
-library(shinybusy)
-library(shinydashboard)
-library(shinyjs)
 library(shinyWidgets)
-library(sp)
+library(shinyBS)
+library(dplyr)
+library(GWmodel)
 data(USelect)
 ################################################################################
 header <- shinydashboard:: dashboardHeader(
-  title = "GeoWeightedModels",
+  title = "GeoWeightedModel",
   titleWidth = 320,
   tags$li(class = "dropdown",
           actionLink("stop_radiant",
@@ -122,7 +111,7 @@ background-color: #69c3ff;}
                tabPanel(
                  " ",
                  h2(em(strong(
-                   "GeoWeightedModels:
+                   "GeoWeightedModel:
                    An R package for Geographically Weighted Models")
                  ),
                  align = "center"),
@@ -277,7 +266,7 @@ background-color: #69c3ff;}
                                         offLabel = "FALSE",
                                         size = "mini")
               ,
-          shinyalert::useShinyalert(),
+          shinyalert::useShinyalert(force = TRUE),
           shinyjs::useShinyjs(),
           shinyWidgets::actionBttn(
                         inputId = "Run1", # run dMat
@@ -591,7 +580,7 @@ background-color: #69c3ff;}
                     offLabel = "FALSE",
                     size = "mini")
               )),
-            shinyalert::useShinyalert(),
+            shinyalert::useShinyalert(force = TRUE),
             shinyjs::useShinyjs(),
             shinyWidgets::actionBttn(
               inputId = "Runbw",
@@ -696,7 +685,7 @@ background-color: #69c3ff;}
                              onLabel = "TRUE",
                              offLabel = "FALSE",
                              size = "mini")),
-                       shinyalert::useShinyalert(),
+                       shinyalert::useShinyalert(force = TRUE),
                        shinyjs::useShinyjs(),
                        shinyWidgets::actionBttn(
                          inputId = "Rungwss",
@@ -869,7 +858,7 @@ background-color: #69c3ff;}
                                           step = 0.05
                               )),
 
-                          shinyalert::useShinyalert(),
+                          shinyalert::useShinyalert(force = TRUE),
                           shinyjs::useShinyjs(),
                           shinyWidgets::actionBttn(
                             inputId = "Runbgwrd",
@@ -957,7 +946,7 @@ background-color: #69c3ff;}
                                       step = 0.05
                           )),
 
-                      shinyalert::useShinyalert(),
+                      shinyalert::useShinyalert(force = TRUE),
                       shinyjs::useShinyjs(),
                       shinyWidgets::actionBttn(
                         inputId = "Runbgwr",
@@ -1060,7 +1049,7 @@ background-color: #69c3ff;}
                                     value = 0,
                                     step = 0.05
                                     )),
-                    shinyalert::useShinyalert(),
+                    shinyalert::useShinyalert(force = TRUE),
                     shinyjs::useShinyjs(),
                     shinyWidgets::actionBttn(
                       inputId = "RunGGWR",
@@ -1154,7 +1143,7 @@ background-color: #69c3ff;}
                                       step = 0.05
                           )),
 
-                      shinyalert::useShinyalert(),
+                      shinyalert::useShinyalert(force = TRUE),
                       shinyjs::useShinyjs(),
                       shinyWidgets::actionBttn(
                         inputId = "RunRobust",
@@ -1242,7 +1231,7 @@ background-color: #69c3ff;}
                                       step = 0.05
                           )),
 
-                      shinyalert::useShinyalert(),
+                      shinyalert::useShinyalert(force = TRUE),
                       shinyjs::useShinyjs(),
                       shinyWidgets::actionBttn(
                         inputId = "Runhetero",
@@ -1344,7 +1333,7 @@ background-color: #69c3ff;}
                                       step = 0.05
                           )),
 
-                      shinyalert::useShinyalert(),
+                      shinyalert::useShinyalert(force = TRUE),
                       shinyjs::useShinyjs(),
                       shinyWidgets::actionBttn(
                         inputId = "Runmixed",
@@ -1416,7 +1405,7 @@ background-color: #69c3ff;}
                                       offLabel = "FALSE",
                                       size = "mini")),
 
-                      shinyalert::useShinyalert(),
+                      shinyalert::useShinyalert(force = TRUE),
                       shinyjs::useShinyjs(),
                       shinyWidgets::actionBttn(
                         inputId = "Runscal",
@@ -1922,7 +1911,7 @@ shinydashboard::tabItem(
         max = 2,
         value = 0,
         step = 0.05),
-      shinyalert::useShinyalert(),
+      shinyalert::useShinyalert(force = TRUE),
       shinyjs::useShinyjs(),
       shinyWidgets::actionBttn(
         inputId = "Rungwpca",
@@ -2160,7 +2149,7 @@ shinydashboard::tabItem(
             max = 2,
             value = 0,
             step = 0.05)),
-      shinyalert::useShinyalert(),
+      shinyalert::useShinyalert(force = TRUE),
       shinyjs::useShinyjs(),
       shinyWidgets::actionBttn(
         inputId = "Rungwda",
@@ -2285,7 +2274,7 @@ shinydashboard::tabItem(tabName = "tab6",
                                                         "less"= "less",
                                                         "two.sided"= "two.sided"),
                                          selected = "greater"),
-                            shinyalert::useShinyalert(),
+                            shinyalert::useShinyalert(force = TRUE),
                           shinyjs::useShinyjs(),
                           shinyWidgets::actionBttn(
                             inputId = "Runauto",

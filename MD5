@@ -1,10 +1,10 @@
-76e01e7b1ec98e141bdfea57f97ce8c9 *DESCRIPTION
-93e1a0c1391a291bd5001071c6b55c86 *NAMESPACE
-7abdb3df13896463d85c79244d3abe7a *R/runGeoWeightedModel.R
+e696bbad26b7e18d43a74ce412a4d370 *DESCRIPTION
+5ec13f88920c1d6b26c108a57a6102be *NAMESPACE
+a2d99de2f8c21ac09206fcdb1fc007a9 *R/runGeoWeightedModel.R
 1f648cccfd878af9f0bccea1a5a15efd *R/zzz.R
 933063af5e66fbb6d92b94eea997ed6b *inst/GeoWeightedModelApp/global.R
 aadbf255fe8a058d31b2ba3a07c146ce *inst/GeoWeightedModelApp/server.R
-c9fbda6173a3f88d138f08b99ad84fbe *inst/GeoWeightedModelApp/ui.R
+9eab6931ee597027c779c02251ef48ec *inst/GeoWeightedModelApp/ui.R
 58acaa316a001217aa7ffa38a65b7933 *inst/GeoWeightedModelApp/www/Distance_Matrix.html
 acca853c86645f82bfecaa532ee8cc7d *inst/GeoWeightedModelApp/www/Help_Autocorrelation.html
 4ece56add974a36097ba4d4bade340df *inst/GeoWeightedModelApp/www/Help_bw.html
